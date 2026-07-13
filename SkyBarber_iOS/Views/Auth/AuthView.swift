@@ -162,3 +162,8 @@ struct AuthView_Previews: PreviewProvider {
         AuthView()
     }
 }
+
+#Preview {
+    AuthView()
+        .preferredColorScheme(.dark)
+}
