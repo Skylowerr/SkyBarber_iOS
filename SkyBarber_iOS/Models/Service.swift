@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+struct Service: Identifiable, Codable {
+    let id: String
+    let title: String
+    let price: Double
+    let duration: Int // In minutes
+    let iconName: String
+}
