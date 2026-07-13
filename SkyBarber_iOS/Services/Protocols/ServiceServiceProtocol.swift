@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+protocol ServiceServiceProtocol {
+    func fetchServices() async throws -> [Service]
+    func bookAppointment(appointment: Appointment) async throws
+    func fetchUserAppointments(userId: String) async throws -> [Appointment]
+}
