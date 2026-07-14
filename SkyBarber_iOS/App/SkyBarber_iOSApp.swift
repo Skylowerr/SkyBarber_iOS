@@ -8,10 +8,21 @@
 import SwiftUI
 
 @main
-struct SkyBarber_iOSApp: App {
+struct SkyBarberApp: App {
+    // Bu bizim ana oturum yöneticimiz
+    @StateObject private var authViewModel = AuthViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if let currentUser = authViewModel.currentUser {
+                    HomeView(currentUser: currentUser)
+                } else {
+                    // authViewModel'ı buraya parametre olarak gönderiyoruz!
+                    AuthView(viewModel: authViewModel)
+                }
+            }
+            .preferredColorScheme(.dark)
         }
     }
 }

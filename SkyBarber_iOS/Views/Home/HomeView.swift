@@ -1,11 +1,14 @@
 import SwiftUI
 
 struct HomeView: View {
-    // 1. Inject ViewModels
+    // 1. ViewModel'ları içeri alıyoruz
     @StateObject private var viewModel = HomeViewModel()
-    @State private var navigateToBooking = false
     
-    // Pass User info down from active session
+    // 2. Sayfa geçişlerini kontrol eden tetikleyicilerimiz (Burası yeni eklendi)
+    @State private var navigateToBooking = false
+    @State private var navigateToProfile = false // Profil ekranına geçiş için durum
+    
+    // Aktif oturumdaki kullanıcı bilgisi
     let currentUser: User
     
     var body: some View {
@@ -15,7 +18,8 @@ struct HomeView: View {
                     .ignoresSafeArea()
                 
                 VStack(spacing: 20) {
-                    // Header
+                    
+                    // --- ÜST BAR (HEADER) BAŞLANGICI ---
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Welcome, \(currentUser.fullName)")
@@ -27,14 +31,21 @@ struct HomeView: View {
                         }
                         Spacer()
                         
-                        Image(systemName: "person.circle.fill")
-                            .font(.system(size: 36))
-                            .foregroundColor(.appAccent)
+                        // ANLAMADIĞIN DEĞİŞİKLİK BURASI AGA:
+                        // Düz resmi sildik, yerine tıklanabilir ve bizi Profile uçuran bu butonu koyduk:
+                        Button(action: {
+                            navigateToProfile = true // Butona basılınca bu durumu 'true' yapıyoruz
+                        }) {
+                            Image(systemName: "person.circle.fill")
+                                .font(.system(size: 36))
+                                .foregroundColor(.appAccent)
+                        }
                     }
                     .padding(.horizontal)
                     .padding(.top, 10)
+                    // --- ÜST BAR (HEADER) BİTİŞİ ---
                     
-                    // Promo Card
+                    // Kampanya Kartı
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Weekly Offer")
                             .font(.caption)
@@ -65,7 +76,7 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                     
-                    // Services List with Loading State
+                    // Hizmetler Listesi
                     if viewModel.isLoading {
                         Spacer()
                         ProgressView("Loading services...")
@@ -94,7 +105,7 @@ struct HomeView: View {
                         }
                     }
                     
-                    // Book Appointment Button
+                    // Randevu Al Butonu
                     Button(action: {
                         if viewModel.selectedService != nil {
                             navigateToBooking = true
@@ -114,13 +125,19 @@ struct HomeView: View {
                 }
             }
             .task {
-                // Fetch services when page loads (Modern swift load hook)
                 await viewModel.loadServices()
             }
+            // --- GEÇİŞ ROTASYONLARI (NAVIGATION DESTINATIONS) ---
+            
+            // 1. Randevu ekranına giden yol
             .navigationDestination(isPresented: $navigateToBooking) {
                 if let selectedService = viewModel.selectedService {
                     BookingView(currentUser: currentUser, selectedService: selectedService)
                 }
+            }
+
+            .navigationDestination(isPresented: $navigateToProfile) {
+                ProfileView(currentUser: currentUser)
             }
         }
     }

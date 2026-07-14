@@ -28,4 +28,22 @@ class MockServiceService: ServiceServiceProtocol {
     func fetchUserAppointments(userId: String) async throws -> [Appointment] {
         return appointments.filter { $0.userId == userId }
     }
+    
+    func cancelAppointment(appointmentId: String) async throws {
+        try await Task.sleep(nanoseconds: 500_000_000)
+        if let index = appointments.firstIndex(where: { $0.id == appointmentId }) {
+            // Randevu durumunu iptal edildi olarak güncelle
+            let updated = Appointment(
+                id: appointments[index].id,
+                userId: appointments[index].userId,
+                userName: appointments[index].userName,
+                serviceId: appointments[index].serviceId,
+                serviceTitle: appointments[index].serviceTitle,
+                date: appointments[index].date,
+                timeSlot: appointments[index].timeSlot,
+                status: .cancelled
+            )
+            appointments[index] = updated
+        }
+    }
 }
