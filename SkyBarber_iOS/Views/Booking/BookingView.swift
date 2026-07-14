@@ -65,7 +65,10 @@ struct BookingView: View {
                                 .font(.headline)
                                 .foregroundColor(.appTextSecondary)
                             
-                            TimeSlotGrid(slots: timeSlots, selectedSlot: $selectedTime)
+                            TimeSlotGrid(
+                                slots: viewModel.getAvailableSlots(for: selectedDate),
+                                selectedSlot: $selectedTime
+                            )
                         }
                         .padding(.horizontal)
                         

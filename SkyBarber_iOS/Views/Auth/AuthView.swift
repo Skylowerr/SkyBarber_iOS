@@ -2,8 +2,7 @@ import SwiftUI
 
 struct AuthView: View {
     // 1. ViewModel injection
-    @StateObject private var viewModel = AuthViewModel()
-    
+    @ObservedObject var viewModel: AuthViewModel
     @State private var isLoginMode = true
     @State private var email = ""
     @State private var password = ""
@@ -115,5 +114,6 @@ struct AuthView: View {
 }
 
 #Preview {
-    AuthView()
+    AuthView(viewModel: AuthViewModel())
+        .preferredColorScheme(.dark)
 }
