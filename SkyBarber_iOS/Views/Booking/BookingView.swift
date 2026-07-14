@@ -1,21 +1,17 @@
-//
-//  BookingView.swift
-//  SkyBarber_iOS
-//
-//  Created by Emirhan Gökçe on 14.07.2026.
-//
-
 import SwiftUI
 
 struct BookingView: View {
     @Environment(\.dismiss) private var dismiss
     
-    // Tasarım durumları (İleride BookingViewModel'e bağlanacak)
+    // 1. Inject ViewModels
+    @StateObject private var viewModel = BookingViewModel()
+    
+    let currentUser: User
+    let selectedService: Service
+    
     @State private var selectedDate = Date()
     @State private var selectedTime: String? = nil
-    @State private var showSuccessAlert = false
     
-    // Berber dükkanının çalışma saatleri
     let timeSlots = [
         "09:00", "10:00", "11:00",
         "13:00", "14:00", "15:00",
@@ -28,7 +24,7 @@ struct BookingView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
-                // Özel Geri Butonlu Header
+                // Custom Header
                 HStack {
                     Button(action: { dismiss() }) {
                         Image(systemName: "chevron.left")
@@ -36,11 +32,10 @@ struct BookingView: View {
                             .foregroundColor(.appAccent)
                     }
                     Spacer()
-                    Text("Randevu Tarihi")
+                    Text("Select Date & Time")
                         .font(.title3.bold())
                         .foregroundColor(.appTextPrimary)
                     Spacer()
-                    // Dengeli durması için hayali boşluk
                     Spacer().frame(width: 24)
                 }
                 .padding(.horizontal)
@@ -48,67 +43,93 @@ struct BookingView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // 1. Takvim Alanı (Web'deki takvim seçici)
+                        // Date Picker
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Tarih Seçin")
+                            Text("Choose Date")
                                 .font(.headline)
                                 .foregroundColor(.appTextSecondary)
                             
-                            DatePicker("Tarih", selection: $selectedDate, in: Date()..., displayedComponents: .date)
+                            DatePicker("Date", selection: $selectedDate, in: Date()..., displayedComponents: .date)
                                 .datePickerStyle(.graphical)
                                 .accentColor(.appAccent)
                                 .padding()
                                 .background(Color.appCardBackground)
                                 .cornerRadius(16)
-                                .preferredColorScheme(.dark) // Koyu moda zorluyoruz takvimi
+                                .preferredColorScheme(.dark)
                         }
                         .padding(.horizontal)
                         
-                        // 2. Saat Dilimi Alanı
+                        // Time Slots
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Saat Seçin")
+                            Text("Choose Time")
                                 .font(.headline)
                                 .foregroundColor(.appTextSecondary)
                             
                             TimeSlotGrid(slots: timeSlots, selectedSlot: $selectedTime)
                         }
                         .padding(.horizontal)
+                        
+                        // Show ViewModel Business Logic Error (e.g., closed on Sundays)
+                        if let errorMessage = viewModel.errorMessage {
+                            Text(errorMessage)
+                                .font(.subheadline)
+                                .foregroundColor(.red)
+                                .bold()
+                                .padding()
+                                .multilineTextAlignment(.center)
+                        }
                     }
                 }
                 
-                // 3. Randevuyu Tamamla Butonu
+                // Confirm Button with loading action
                 Button(action: {
-                    if selectedTime != nil {
-                        showSuccessAlert = true
+                    if let selectedTime = selectedTime {
+                        Task {
+                            await viewModel.bookAppointment(
+                                user: currentUser,
+                                service: selectedService,
+                                date: selectedDate,
+                                timeSlot: selectedTime
+                            )
+                        }
                     }
                 }) {
-                    Text("Randevuyu Onayla")
-                        .font(.headline)
-                        .foregroundColor(.appBackground)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 55)
-                        .background(selectedTime != nil ? Color.appAccent : Color.appTextSecondary.opacity(0.3))
-                        .cornerRadius(12)
+                    ZStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .tint(.appBackground)
+                        } else {
+                            Text("Confirm Appointment")
+                                .font(.headline)
+                                .foregroundColor(.appBackground)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 55)
+                    .background(selectedTime != nil ? Color.appAccent : Color.appTextSecondary.opacity(0.3))
+                    .cornerRadius(12)
                 }
-                .disabled(selectedTime == nil)
+                .disabled(selectedTime == nil || viewModel.isLoading)
                 .padding(.horizontal)
                 .padding(.bottom, 15)
             }
         }
-        .navigationBarBackButtonHidden(true) // Varsayılan geri butonunu gizliyoruz
-        .alert(isPresented: $showSuccessAlert) {
-            Alert(
-                title: Text("Başarılı! 🎉"),
-                message: Text("Randevunuz başarıyla oluşturuldu. Koltuk sizi bekler!"),
-                dismissButton: .default(Text("Ana Sayfaya Dön"), action: {
-                    dismiss()
-                })
-            )
+        .navigationBarBackButtonHidden(true)
+        // Handle Success alert via ViewModel binding
+        .alert("Success! 🎉", isPresented: $viewModel.isSuccess) {
+            Button("Back to Home") {
+                viewModel.resetStatus()
+                dismiss()
+            }
+        } message: {
+            Text("Your appointment for \(selectedService.title) has been successfully created!")
         }
     }
 }
 
 #Preview {
-    BookingView()
-        .preferredColorScheme(.dark)
+    BookingView(
+        currentUser: User(id: "1", fullName: "Emirhan Sky", email: "test@gmail.com", phoneNumber: "123", role: .customer),
+        selectedService: Service(id: "1", title: "Haircut", price: 300, duration: 30, iconName: "scissors")
+    )
 }

@@ -1,21 +1,9 @@
-//
-//  AuthView.swift
-//  SkyBarber_iOS
-//
-//  Created by Emirhan Gökçe on 14.07.2026.
-//
-
-//
-//  AuthView.swift
-//  SkyBarber_iOS
-//
-//  Created by Emirhan Gökçe on 14.07.2026.
-//
-
 import SwiftUI
 
 struct AuthView: View {
-    // Arayüz durumunu tutan değişkenler (İleride ViewModel'e bağlayacağız)
+    // 1. ViewModel injection
+    @StateObject private var viewModel = AuthViewModel()
+    
     @State private var isLoginMode = true
     @State private var email = ""
     @State private var password = ""
@@ -24,146 +12,108 @@ struct AuthView: View {
     
     var body: some View {
         ZStack {
-            // Arka Plan
             Color.appBackground
                 .ignoresSafeArea()
             
             VStack(spacing: 25) {
                 Spacer()
                 
-                // Logo & Başlık (Web'deki SkyBarber havası)
+                // Logo & Header
                 VStack(spacing: 10) {
                     Image(systemName: "scissors")
                         .font(.system(size: 60))
                         .foregroundColor(.appAccent)
-                        .rotationEffect(.degrees(-90)) // Makas janti dursun
+                        .rotationEffect(.degrees(-90))
                     
                     Text("SKYBARBER")
                         .font(.system(size: 32, weight: .bold, design: .monospaced))
                         .foregroundColor(.appTextPrimary)
                     
-                    Text(isLoginMode ? "Giriş yapın ve randevunuzu alın." : "Yeni hesap oluşturun.")
+                    Text(isLoginMode ? "Sign in to book your appointment." : "Create a new account.")
                         .font(.subheadline)
                         .foregroundColor(.appTextSecondary)
                 }
                 .padding(.bottom, 20)
                 
-                // Giriş / Kayıt Form Alanları
+                // Form Fields
                 VStack(spacing: 16) {
                     if !isLoginMode {
-                        // Sadece Kayıt Modunda gözükecek Ad Soyad alanı
-                        CustomTextField(placeholder: "Ad Soyad", text: $fullName, icon: "person")
-                        CustomTextField(placeholder: "Telefon Numarası", text: $phoneNumber, icon: "phone")
+                        CustomTextField(placeholder: "Full Name", text: $fullName, icon: "person")
+                        CustomTextField(placeholder: "Phone Number", text: $phoneNumber, icon: "phone")
                     }
                     
-                    CustomTextField(placeholder: "E-posta Adresi", text: $email, icon: "envelope")
+                    CustomTextField(placeholder: "Email Address", text: $email, icon: "envelope")
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                     
-                    CustomSecureField(placeholder: "Şifre", text: $password, icon: "lock")
+                    CustomSecureField(placeholder: "Password", text: $password, icon: "lock")
                 }
                 .padding(.horizontal, 24)
                 
-                // Aksiyon Butonu (Giriş Yap / Kayıt Ol)
-                Button(action: {
-                    // İleride burası ViewModel'i tetikleyecek
-                    print("Butona basıldı: \(isLoginMode ? "Giriş" : "Kayıt")")
-                }) {
-                    Text(isLoginMode ? "Giriş Yap" : "Kayıt Ol")
-                        .font(.headline)
-                        .foregroundColor(.appBackground)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 55)
-                        .background(Color.appAccent)
-                        .cornerRadius(12)
-                        .shadow(color: Color.appAccent.opacity(0.3), radius: 10, x: 0, y: 5)
+                // Error Message Display
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .font(.footnote)
+                        .foregroundColor(.red)
+                        .padding(.horizontal, 24)
+                        .multilineTextAlignment(.center)
                 }
+                
+                // Action Button (Login / Register) with Loading indicator
+                Button(action: {
+                    Task {
+                        if isLoginMode {
+                            await viewModel.login(email: email, password: password)
+                        } else {
+                            await viewModel.register(email: email, password: password, fullName: fullName, phoneNumber: phoneNumber)
+                        }
+                    }
+                }) {
+                    ZStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .appBackground))
+                        } else {
+                            Text(isLoginMode ? "Login" : "Register")
+                                .font(.headline)
+                                .foregroundColor(.appBackground)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 55)
+                    .background(Color.appAccent)
+                    .cornerRadius(12)
+                    .shadow(color: Color.appAccent.opacity(0.3), radius: 10, x: 0, y: 5)
+                }
+                .disabled(viewModel.isLoading)
                 .padding(.horizontal, 24)
                 .padding(.top, 10)
                 
-                // Mod Değiştirme Linki (Web'deki toggle-auth butonu)
+                // Toggle Button
                 Button(action: {
                     withAnimation(.spring()) {
                         isLoginMode.toggle()
+                        viewModel.errorMessage = nil // Clear error on switch
                     }
                 }) {
                     HStack {
-                        Text(isLoginMode ? "Hesabınız yok mu?" : "Zaten üye misiniz?")
+                        Text(isLoginMode ? "Don't have an account?" : "Already registered?")
                             .foregroundColor(.appTextSecondary)
-                        Text(isLoginMode ? "Yeni Hesap Oluştur" : "Giriş Yap")
+                        Text(isLoginMode ? "Create Account" : "Login")
                             .foregroundColor(.appAccent)
                             .bold()
                     }
                     .font(.footnote)
                 }
+                .disabled(viewModel.isLoading)
                 
                 Spacer()
             }
         }
-    }
-}
-
-// MARK: - Şık ve Özelleştirilmiş Input Alanları (SOLID - Single Responsibility)
-
-struct CustomTextField: View {
-    let placeholder: String
-    @Binding var text: String
-    let icon: String
-    
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundColor(.appAccent)
-                .frame(width: 20)
-            
-            TextField(placeholder, text: $text)
-                .foregroundColor(.appTextPrimary)
-                // Placeholder rengini gri yapmak için iOS 17+ desteği
-                .tint(.appAccent)
-        }
-        .padding()
-        .background(Color.appCardBackground)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.appTextSecondary.opacity(0.1), lineWidth: 1)
-        )
-    }
-}
-
-struct CustomSecureField: View {
-    let placeholder: String
-    @Binding var text: String
-    let icon: String
-    
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundColor(.appAccent)
-                .frame(width: 20)
-            
-            SecureField(placeholder, text: $text)
-                .foregroundColor(.appTextPrimary)
-                .tint(.appAccent)
-        }
-        .padding()
-        .background(Color.appCardBackground)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.appTextSecondary.opacity(0.1), lineWidth: 1)
-        )
-    }
-}
-
-// Xcode'da önizleme yapmak için
-struct AuthView_Previews: PreviewProvider {
-    static var previews: some View {
-        AuthView()
+        // If login successful, transition will be handled by App router
     }
 }
 
 #Preview {
     AuthView()
-        .preferredColorScheme(.dark)
 }
