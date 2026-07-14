@@ -12,9 +12,11 @@
 		6B38C5AC30063EBC0041FD83 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5AB30063EBC0041FD83 /* FirebaseFirestore */; };
 		6B38C5AE30063EBC0041FD83 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5AD30063EBC0041FD83 /* FirebaseFirestoreCombine-Community */; };
 		6B38C5B030063EBC0041FD83 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5AF30063EBC0041FD83 /* FirebaseStorage */; };
+		6B38C5B9300642730041FD83 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6B38C5B73006426F0041FD83 /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6B38C5B73006426F0041FD83 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		6B7EFE6A3005885F00487318 /* SkyBarber_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkyBarber_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -47,6 +49,7 @@
 			children = (
 				6B7EFE6C3005885F00487318 /* SkyBarber_iOS */,
 				6B7EFE6B3005885F00487318 /* Products */,
+				6B38C5B73006426F0041FD83 /* .gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -130,6 +133,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B38C5B9300642730041FD83 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
