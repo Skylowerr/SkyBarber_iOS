@@ -1,24 +1,12 @@
-//
-//  HomeView.swift
-//  SkyBarber_iOS
-//
-//  Created by Emirhan Gökçe on 14.07.2026.
-//
-
 import SwiftUI
 
 struct HomeView: View {
-    // Tasarımın durumsal halleri (İleride HomeViewModel'e bağlanacak)
-    @State private var selectedServiceId: String? = nil
+    // 1. Inject ViewModels
+    @StateObject private var viewModel = HomeViewModel()
     @State private var navigateToBooking = false
     
-    // Geçici sahte veriler (Hata vermemesi için)
-    let services = [
-        (id: "1", title: "Saç Kesimi", price: 300.0, duration: 30, icon: "scissors"),
-        (id: "2", title: "Sakal Tıraşı", price: 150.0, duration: 20, icon: "mustard"), // Janti tıraş bıçağı ikonu niyetine
-        (id: "3", title: "Saç & Sakal Kombin", price: 400.0, duration: 50, icon: "comb"),
-        (id: "4", title: "Cilt Bakımı & Maske", price: 200.0, duration: 30, icon: "face.smiling")
-    ]
+    // Pass User info down from active session
+    let currentUser: User
     
     var body: some View {
         NavigationStack {
@@ -27,31 +15,28 @@ struct HomeView: View {
                     .ignoresSafeArea()
                 
                 VStack(spacing: 20) {
-                    // Üst Bar (Header)
+                    // Header
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Merhaba Emirhan,")
+                            Text("Welcome, \(currentUser.fullName)")
                                 .font(.subheadline)
                                 .foregroundColor(.appTextSecondary)
-                            Text("Tarzını Seç ✂️")
+                            Text("Select a Service ✂️")
                                 .font(.title.bold())
                                 .foregroundColor(.appTextPrimary)
                         }
                         Spacer()
                         
-                        // Profil Butonu
-                        Button(action: {}) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.system(size: 36))
-                                .foregroundColor(.appAccent)
-                        }
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 36))
+                            .foregroundColor(.appAccent)
                     }
                     .padding(.horizontal)
                     .padding(.top, 10)
                     
-                    // Kampanya Kartı (Web'deki gibi şık durması için)
+                    // Promo Card
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Haftalık Fırsat")
+                        Text("Weekly Offer")
                             .font(.caption)
                             .bold()
                             .padding(.horizontal, 8)
@@ -60,11 +45,11 @@ struct HomeView: View {
                             .foregroundColor(.appAccent)
                             .cornerRadius(4)
                         
-                        Text("Saç + Sakal + Maske Kombini")
+                        Text("Hair + Beard + Facial Mask Combo")
                             .font(.title3.bold())
                             .foregroundColor(.white)
                         
-                        Text("Bu haftaya özel sadece 500 TL!")
+                        Text("Only 500 TL for this week!")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -74,61 +59,73 @@ struct HomeView: View {
                     .cornerRadius(16)
                     .padding(.horizontal)
                     
-                    Text("Hizmetlerimiz")
+                    Text("Services")
                         .font(.headline)
                         .foregroundColor(.appTextPrimary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                     
-                    // Hizmetler Listesi
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            ForEach(services, id: \.id) { service in
-                                Button(action: {
-                                    selectedServiceId = service.id
-                                }) {
-                                    ServiceCardView(
-                                        title: service.title,
-                                        price: service.price,
-                                        duration: service.duration,
-                                        iconName: service.icon,
-                                        isSelected: selectedServiceId == service.id
-                                    )
+                    // Services List with Loading State
+                    if viewModel.isLoading {
+                        Spacer()
+                        ProgressView("Loading services...")
+                            .tint(.appAccent)
+                            .foregroundColor(.appTextSecondary)
+                        Spacer()
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                ForEach(viewModel.services) { service in
+                                    Button(action: {
+                                        viewModel.selectService(service)
+                                    }) {
+                                        ServiceCardView(
+                                            title: service.title,
+                                            price: service.price,
+                                            duration: service.duration,
+                                            iconName: service.iconName,
+                                            isSelected: viewModel.selectedService?.id == service.id
+                                        )
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
-                                .buttonStyle(PlainButtonStyle())
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                     
-                    // Randevu Al Butonu
+                    // Book Appointment Button
                     Button(action: {
-                        if selectedServiceId != nil {
+                        if viewModel.selectedService != nil {
                             navigateToBooking = true
                         }
                     }) {
-                        Text("Randevu Ayarla")
+                        Text("Book Appointment")
                             .font(.headline)
                             .foregroundColor(.appBackground)
                             .frame(maxWidth: .infinity)
                             .frame(height: 55)
-                            .background(selectedServiceId != nil ? Color.appAccent : Color.appTextSecondary.opacity(0.3))
+                            .background(viewModel.selectedService != nil ? Color.appAccent : Color.appTextSecondary.opacity(0.3))
                             .cornerRadius(12)
-                            .shadow(color: selectedServiceId != nil ? Color.appAccent.opacity(0.3) : Color.clear, radius: 10, x: 0, y: 5)
                     }
-                    .disabled(selectedServiceId == nil)
+                    .disabled(viewModel.selectedService == nil || viewModel.isLoading)
                     .padding(.horizontal)
                     .padding(.bottom, 15)
                 }
             }
+            .task {
+                // Fetch services when page loads (Modern swift load hook)
+                await viewModel.loadServices()
+            }
             .navigationDestination(isPresented: $navigateToBooking) {
-                BookingView() // Randevu ekranına yönlendirme yapıyoruz
+                if let selectedService = viewModel.selectedService {
+                    BookingView(currentUser: currentUser, selectedService: selectedService)
+                }
             }
         }
     }
 }
 
 #Preview {
-    HomeView()
-        .preferredColorScheme(.dark)
+    HomeView(currentUser: User(id: "1", fullName: "Emirhan Sky", email: "test@gmail.com", phoneNumber: "123", role: .customer))
 }
