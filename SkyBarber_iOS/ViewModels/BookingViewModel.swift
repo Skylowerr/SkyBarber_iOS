@@ -16,7 +16,7 @@ class BookingViewModel: ObservableObject {
         "16:00", "17:00", "18:00"
     ]
     
-    init(serviceService: ServiceServiceProtocol = MockServiceService()) {
+    init(serviceService: ServiceServiceProtocol = FirebaseStoreService()) {
         self.serviceService = serviceService
     }
     

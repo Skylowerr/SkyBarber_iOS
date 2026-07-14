@@ -6,11 +6,23 @@
 //
 
 import SwiftUI
+import FirebaseCore // <-- Bunu ekledik
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure() // Firebase'i burada ayağa kaldırıyoruz
+        return true
+    }
+}
 
 @main
 struct SkyBarberApp: App {
-    // Bu bizim ana oturum yöneticimiz
-    @StateObject private var authViewModel = AuthViewModel()
+    // AppDelegate entegrasyonu
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    // Uygulama seviyesindeki ana oturum yöneticisi (Artık gerçek FirebaseAuthService ile çalışacak!)
+    @StateObject private var authViewModel = AuthViewModel(authService: FirebaseAuthService())
     
     var body: some Scene {
         WindowGroup {
@@ -18,7 +30,6 @@ struct SkyBarberApp: App {
                 if let currentUser = authViewModel.currentUser {
                     HomeView(currentUser: currentUser)
                 } else {
-                    // authViewModel'ı buraya parametre olarak gönderiyoruz!
                     AuthView(viewModel: authViewModel)
                 }
             }

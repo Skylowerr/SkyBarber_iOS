@@ -17,7 +17,7 @@ class HomeViewModel: ObservableObject {
     
     private let serviceService: ServiceServiceProtocol
     
-    init(serviceService: ServiceServiceProtocol = MockServiceService()) {
+    init(serviceService: ServiceServiceProtocol = FirebaseStoreService()) {
         self.serviceService = serviceService
     }
     
