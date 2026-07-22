@@ -132,7 +132,7 @@ struct HomeView: View {
             // 1. Randevu ekranına giden yol
             .navigationDestination(isPresented: $navigateToBooking) {
                 if let selectedService = viewModel.selectedService {
-                    BookingView(currentUser: currentUser, selectedService: selectedService)
+                    BookingView(service: selectedService, currentUser: currentUser)
                 }
             }
 

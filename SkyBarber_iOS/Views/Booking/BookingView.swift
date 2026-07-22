@@ -1,138 +1,146 @@
 import SwiftUI
+import Combine
 
 struct BookingView: View {
+    let service: Service
+    let currentUser: User
+    
+    @StateObject private var viewModel = BookingViewModel()
     @Environment(\.dismiss) private var dismiss
     
-    // 1. Inject ViewModels
-    @StateObject private var viewModel = BookingViewModel()
-    
-    let currentUser: User
-    let selectedService: Service
-    
-    @State private var selectedDate = Date()
-    @State private var selectedTime: String? = nil
-    
-    let timeSlots = [
-        "09:00", "10:00", "11:00",
-        "13:00", "14:00", "15:00",
-        "16:00", "17:00", "18:00"
-    ]
-    
     var body: some View {
-        ZStack {
-            Color.appBackground
-                .ignoresSafeArea()
-            
-            VStack(spacing: 20) {
-                // Custom Header
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundColor(.appAccent)
-                    }
-                    Spacer()
-                    Text("Select Date & Time")
-                        .font(.title3.bold())
-                        .foregroundColor(.appTextPrimary)
-                    Spacer()
-                    Spacer().frame(width: 24)
-                }
-                .padding(.horizontal)
-                .padding(.top, 10)
+        NavigationStack {
+            ZStack {
+                Color.black.ignoresSafeArea()
                 
                 ScrollView {
-                    VStack(spacing: 24) {
-                        // Date Picker
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Choose Date")
-                                .font(.headline)
-                                .foregroundColor(.appTextSecondary)
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Header Card
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(service.title)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
                             
-                            DatePicker("Date", selection: $selectedDate, in: Date()..., displayedComponents: .date)
-                                .datePickerStyle(.graphical)
-                                .accentColor(.appAccent)
-                                .padding()
-                                .background(Color.appCardBackground)
-                                .cornerRadius(16)
-                                .preferredColorScheme(.dark)
+                            HStack {
+                                Label("\(service.duration) min", systemImage: "clock")
+                                Spacer()
+                                Text("$\(Int(service.price))")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.orange)
+                            }
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
                         }
-                        .padding(.horizontal)
+                        .padding()
+                        .background(Color.white.opacity(0.05))
+                        .cornerRadius(16)
+                        
+                        // Date Picker
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Select Date")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            DatePicker(
+                                "",
+                                selection: $viewModel.selectedDate,
+                                in: Date()...,
+                                displayedComponents: [.date]
+                            )
+                            .datePickerStyle(.graphical)
+                            .colorScheme(.dark)
+                            .onChange(of: viewModel.selectedDate) { _ in
+                                viewModel.onDateChanged()
+                            }
+                        }
                         
                         // Time Slots
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Choose Time")
+                            Text("Select Time")
                                 .font(.headline)
-                                .foregroundColor(.appTextSecondary)
+                                .foregroundColor(.white)
                             
-                            TimeSlotGrid(
-                                slots: viewModel.getAvailableSlots(for: selectedDate),
-                                selectedSlot: $selectedTime
-                            )
+                            if viewModel.availableTimeSlots.isEmpty {
+                                Text("No available time slots for this date.")
+                                    .foregroundColor(.gray)
+                                    .font(.subheadline)
+                                    .padding(.vertical, 8)
+                            } else {
+                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 12) {
+                                    ForEach(viewModel.availableTimeSlots, id: \.self) { slot in
+                                        Button {
+                                            viewModel.selectedTimeSlot = slot
+                                        } label: {
+                                            Text(slot)
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .frame(maxWidth: .infinity)
+                                                .padding(.vertical, 12)
+                                                .background(
+                                                    viewModel.selectedTimeSlot == slot ? Color.orange : Color.white.opacity(0.1)
+                                                )
+                                                .foregroundColor(
+                                                    viewModel.selectedTimeSlot == slot ? .black : .white
+                                                )
+                                                .cornerRadius(10)
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        .padding(.horizontal)
                         
-                        // Show ViewModel Business Logic Error (e.g., closed on Sundays)
-                        if let errorMessage = viewModel.errorMessage {
-                            Text(errorMessage)
-                                .font(.subheadline)
+                        // Error Message
+                        if let error = viewModel.errorMessage {
+                            Text(error)
+                                .font(.caption)
                                 .foregroundColor(.red)
-                                .bold()
-                                .padding()
-                                .multilineTextAlignment(.center)
                         }
+                        
+                        // Confirm Button
+                        Button {
+                            Task {
+                                await viewModel.bookAppointment(service: service, user: currentUser)
+                            }
+                        } label: {
+                            HStack {
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .tint(.black)
+                                } else {
+                                    Text("Confirm Booking")
+                                        .fontWeight(.bold)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(viewModel.selectedTimeSlot == nil ? Color.gray : Color.orange)
+                            .foregroundColor(.black)
+                            .cornerRadius(14)
+                        }
+                        .disabled(viewModel.selectedTimeSlot == nil || viewModel.isLoading)
                     }
+                    .padding()
                 }
-                
-                // Confirm Button with loading action
-                Button(action: {
-                    if let selectedTime = selectedTime {
-                        Task {
-                            await viewModel.bookAppointment(
-                                user: currentUser,
-                                service: selectedService,
-                                date: selectedDate,
-                                timeSlot: selectedTime
-                            )
-                        }
+            }
+            .navigationTitle("Book Appointment")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
                     }
-                }) {
-                    ZStack {
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .tint(.appBackground)
-                        } else {
-                            Text("Confirm Appointment")
-                                .font(.headline)
-                                .foregroundColor(.appBackground)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 55)
-                    .background(selectedTime != nil ? Color.appAccent : Color.appTextSecondary.opacity(0.3))
-                    .cornerRadius(12)
+                    .foregroundColor(.orange)
                 }
-                .disabled(selectedTime == nil || viewModel.isLoading)
-                .padding(.horizontal)
-                .padding(.bottom, 15)
             }
-        }
-        .navigationBarBackButtonHidden(true)
-        // Handle Success alert via ViewModel binding
-        .alert("Success! 🎉", isPresented: $viewModel.isSuccess) {
-            Button("Back to Home") {
-                viewModel.resetStatus()
-                dismiss()
+            .alert("Success! 🎉", isPresented: $viewModel.isBookingSuccess) {
+                Button("OK") {
+                    viewModel.resetStatus()
+                    dismiss()
+                }
+            } message: {
+                Text("Your appointment for \(service.title) has been successfully created.")
             }
-        } message: {
-            Text("Your appointment for \(selectedService.title) has been successfully created!")
         }
     }
-}
-
-#Preview {
-    BookingView(
-        currentUser: User(id: "1", fullName: "Emirhan Sky", email: "test@gmail.com", phoneNumber: "123", role: .customer),
-        selectedService: Service(id: "1", title: "Haircut", price: 300, duration: 30, iconName: "scissors")
-    )
 }

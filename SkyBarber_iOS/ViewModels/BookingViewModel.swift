@@ -3,94 +3,109 @@ import Combine
 
 @MainActor
 class BookingViewModel: ObservableObject {
+    @Published var selectedDate = Date()
+    @Published var selectedTimeSlot: String?
+    @Published var availableTimeSlots: [String] = []
     @Published var isLoading = false
-    @Published var isSuccess = false
     @Published var errorMessage: String?
+    @Published var isBookingSuccess = false
     
     private let serviceService: ServiceServiceProtocol
+    private var bookedSlotsForSelectedDate: [String] = []
     
-    // Berber dükkanının standart tüm saatleri
-    private let allTimeSlots = [
-        "09:00", "10:00", "11:00",
-        "13:00", "14:00", "15:00",
-        "16:00", "17:00", "18:00"
+    let allTimeSlots = [
+        "09:00", "10:00", "11:00", "12:00",
+        "13:00", "14:00", "15:00", "16:00",
+        "17:00", "18:00", "19:00", "20:00"
     ]
     
     init(serviceService: ServiceServiceProtocol = FirebaseStoreService()) {
         self.serviceService = serviceService
+        Task {
+            await fetchBookedSlotsAndGenerateAvailable()
+        }
     }
     
-    /// Seçilen tarihe göre sadece gelecekteki uygun saat dilimlerini döner
-    func getAvailableSlots(for date: Date) -> [String] {
+    // View tarafında çağrılan fonksiyonlar
+    func onDateChanged() {
+        Task {
+            await fetchBookedSlotsAndGenerateAvailable()
+        }
+    }
+    
+    func resetStatus() {
+        isBookingSuccess = false
+        errorMessage = nil
+        selectedTimeSlot = nil
+    }
+    
+    func fetchBookedSlotsAndGenerateAvailable() async {
         let calendar = Calendar.current
+        let now = Date()
         
-        // 1. Seçilen gün bugün mü kontrol et
-        if calendar.isDateInToday(date) {
-            // Şu anki saati al (Örn: "12:30" ise hour = 12, minute = 30)
-            let now = Date()
-            let currentHour = calendar.component(.hour, from: now)
-            let currentMinute = calendar.component(.minute, from: now)
+        let isToday = calendar.isDateInToday(selectedDate)
+        let currentHour = calendar.component(.hour, from: now)
+        let currentMinute = calendar.component(.minute, from: now)
+        
+        self.availableTimeSlots = allTimeSlots.filter { slot in
+            if isToday {
+                let components = slot.split(separator: ":").compactMap { Int($0) }
+                if components.count == 2 {
+                    let slotHour = components[0]
+                    let slotMinute = components[1]
+                    
+                    if slotHour < currentHour || (slotHour == currentHour && slotMinute <= currentMinute) {
+                        return false
+                    }
+                }
+            }
             
-            // Tüm slotları tek tek filtrele
-            return allTimeSlots.filter { slot in
-                let parts = slot.split(separator: ":")
-                guard parts.count == 2,
-                      let slotHour = Int(parts[0]),
-                      let slotMinute = Int(parts[1]) else { return false }
-                
-                // Slot saati şu anki saatten büyükse OK
-                if slotHour > currentHour {
-                    return true
-                }
-                // Saatler eşitse dakikaya bak (Örn: slot 12:30, şu an 12:15 ise alınabilir)
-                else if slotHour == currentHour {
-                    return slotMinute > currentMinute
-                }
-                
+            if bookedSlotsForSelectedDate.contains(slot) {
                 return false
             }
+            
+            return true
         }
-        
-        // 2. Seçilen gün gelecek bir günse, tüm saatleri serbest bırak
-        return allTimeSlots
     }
     
-    func bookAppointment(user: User, service: Service, date: Date, timeSlot: String) async {
-        isLoading = true
-        errorMessage = nil
-        
-        // Pazar günü kontrolü
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date)
-        if weekday == 1 { // 1 = Sunday
-            self.errorMessage = "We are closed on Sundays. Please pick another day!"
-            self.isLoading = false
+    func bookAppointment(service: Service, user: User) async {
+        guard let timeSlot = selectedTimeSlot else {
+            errorMessage = "Please select a time slot."
             return
         }
         
-        let appointment = Appointment(
+        isLoading = true
+        errorMessage = nil
+        
+        let calendar = Calendar.current
+        let timeComponents = timeSlot.split(separator: ":").compactMap { Int($0) }
+        
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: selectedDate)
+        if timeComponents.count == 2 {
+            dateComponents.hour = timeComponents[0]
+            dateComponents.minute = timeComponents[1]
+        }
+        
+        let exactAppointmentDate = calendar.date(from: dateComponents) ?? selectedDate
+        
+        let newAppointment = Appointment(
             id: UUID().uuidString,
             userId: user.id,
             userName: user.fullName,
             serviceId: service.id,
             serviceTitle: service.title,
-            date: date,
+            date: exactAppointmentDate,
             timeSlot: timeSlot,
             status: .pending
         )
         
         do {
-            try await serviceService.bookAppointment(appointment: appointment)
-            self.isSuccess = true
-            self.isLoading = false
+            try await serviceService.bookAppointment(appointment: newAppointment)
+            isLoading = false
+            isBookingSuccess = true
         } catch {
-            self.errorMessage = error.localizedDescription
-            self.isLoading = false
+            isLoading = false
+            errorMessage = error.localizedDescription
         }
-    }
-    
-    func resetStatus() {
-        isSuccess = false
-        errorMessage = nil
     }
 }
