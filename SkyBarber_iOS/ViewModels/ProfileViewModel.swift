@@ -1,18 +1,17 @@
-//
-//  ProfileViewModel.swift
-//  SkyBarber_iOS
-//
-//  Created by Emirhan Gökçe on 14.07.2026.
-//
-
 import Foundation
 import Combine
+
 @MainActor
 class ProfileViewModel: ObservableObject {
-    @Published var upcomingAppointments: [Appointment] = []
-    @Published var pastAppointments: [Appointment] = []
+    @Published var appointments: [Appointment] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var selectedTab: ProfileTab = .upcoming
+    
+    enum ProfileTab {
+        case upcoming
+        case past
+    }
     
     private let serviceService: ServiceServiceProtocol
     
@@ -20,34 +19,41 @@ class ProfileViewModel: ObservableObject {
         self.serviceService = serviceService
     }
     
-    func loadAppointments(for userId: String) async {
+    // Gelecekteki veya henüz vakti geçmemiş aktif randevular
+    var upcomingAppointments: [Appointment] {
+        let now = Date()
+        return appointments.filter { appointment in
+            appointment.status != .cancelled && appointment.date >= now.addingTimeInterval(-3600)
+        }.sorted(by: { $0.date < $1.date })
+    }
+    
+    // Tarihi geçmiş veya iptal edilmiş randevular (View'deki .past ismiyle birebir eşlendi)
+    var pastAppointments: [Appointment] {
+        let now = Date()
+        return appointments.filter { appointment in
+            appointment.status == .cancelled || appointment.date < now.addingTimeInterval(-3600)
+        }.sorted(by: { $0.date > $1.date })
+    }
+    
+    func loadAppointments(userId: String) async {
         isLoading = true
         errorMessage = nil
         
         do {
-            let allAppointments = try await serviceService.fetchUserAppointments(userId: userId)
-            let now = Date()
-            
-            // Tarih kıyaslaması ile randevuları ayırıyoruz
-            self.upcomingAppointments = allAppointments.filter { $0.date >= now && $0.status != .cancelled }
-            self.pastAppointments = allAppointments.filter { $0.date < now || $0.status == .cancelled }
-            
-            self.isLoading = false
+            self.appointments = try await serviceService.fetchUserAppointments(userId: userId)
+            isLoading = false
         } catch {
-            self.errorMessage = error.localizedDescription
-            self.isLoading = false
+            isLoading = false
+            errorMessage = error.localizedDescription
         }
     }
     
     func cancelAppointment(id: String, userId: String) async {
-        isLoading = true
         do {
             try await serviceService.cancelAppointment(appointmentId: id)
-            // Listeyi yeniden yükle
-            await loadAppointments(for: userId)
+            await loadAppointments(userId: userId)
         } catch {
-            self.errorMessage = error.localizedDescription
-            self.isLoading = false
+            errorMessage = error.localizedDescription
         }
     }
 }
