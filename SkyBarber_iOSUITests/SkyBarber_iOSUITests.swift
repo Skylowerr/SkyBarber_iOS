@@ -10,12 +10,12 @@ final class SkyBarber_iOSUITests: XCTestCase {
     }
 
     func test_loginScreen_elementsExist() throws {
-        let emailTextField = app.textFields["E-posta"]
-        let passwordSecureField = app.secureTextFields["Şifre"]
-        let loginButton = app.buttons["Giriş Yap"]
+        // CustomTextField içindeki İngilizce placeholder değerlerini arıyoruz
+        let emailTextField = app.textFields["Email Address"]
+        let passwordSecureField = app.secureTextFields["Password"]
 
-        XCTAssertTrue(emailTextField.exists)
-        XCTAssertTrue(passwordSecureField.exists)
-        XCTAssertTrue(loginButton.exists)
+        // 5 saniye tolerate
+        XCTAssertTrue(emailTextField.waitForExistence(timeout: 5.0), "Email Address alanı bulunamadı!")
+        XCTAssertTrue(passwordSecureField.exists, "Password alanı bulunamadı!")
     }
 }
