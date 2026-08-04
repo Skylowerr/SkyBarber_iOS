@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
-import FirebaseCore // <-- Bunu ekledik
+import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        FirebaseApp.configure() // Firebase'i burada ayağa kaldırıyoruz
+        // Test koşmuyorsa Firebase'i yapılandır (SIGABRT çökmesini önler)
+        if NSClassFromString("XCTestCase") == nil {
+            FirebaseApp.configure()
+        }
         return true
     }
 }
@@ -21,8 +24,14 @@ struct SkyBarberApp: App {
     // AppDelegate entegrasyonu
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-    // Uygulama seviyesindeki ana oturum yöneticisi (Artık gerçek FirebaseAuthService ile çalışacak!)
-    @StateObject private var authViewModel = AuthViewModel(authService: FirebaseAuthService())
+    // Test esnasında gerçek Firebase servisi yerine Mock servis enjekte ediyoruz
+    @StateObject private var authViewModel: AuthViewModel = {
+        if NSClassFromString("XCTestCase") != nil {
+            return AuthViewModel(authService: MockAuthService())
+        } else {
+            return AuthViewModel(authService: FirebaseAuthService())
+        }
+    }()
     
     var body: some Scene {
         WindowGroup {
