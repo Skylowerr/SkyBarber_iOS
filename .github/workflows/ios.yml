@@ -23,7 +23,7 @@ jobs:
           xcodebuild test \
             -project SkyBarber_iOS.xcodeproj \
             -scheme SkyBarber_iOS \
-            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 15' \
+            -destination 'platform=iOS Simulator,OS=latest' \
             -only-testing:SkyBarber_iOSTests \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
