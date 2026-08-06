@@ -1,33 +1,59 @@
-name: iOS CI/CD Pipeline
+name: iOS CI
 
 on:
   push:
-    branches: [ "default", "main" ]
+    branches: [ main, default ]
   pull_request:
-    branches: [ "default", "main" ]
+    branches: [ main, default ]
 
 jobs:
-  test:
-    name: Build & Run Unit Tests
-    runs-on: macos-15
+  build_and_test:
+    runs-on: macos-26
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Xcode Version
-        run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer || true
+      - name: List installed Xcode versions
+        run: ls /Applications | grep Xcode
 
-      - name: Show Xcode Version
-        run: xcrun xcodebuild -version
+      - name: Set Default Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.4.1.app/Contents/Developer
 
-      - name: Run Unit Tests
+      - name: Verify Xcode version
+        run: xcodebuild -version
+
+      - name: Show available simulators
+        run: xcrun simctl list devices available
+
+      # .gitignore ile repo'ya commit edilmeyen Firebase config
+      # dosyasını, GitHub Secrets'ta base64 olarak saklanan
+      # değerden decode edip doğru path'e yazıyoruz.
+      - name: Add GoogleService-Info.plist
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 --decode > SkyBarber_iOS/GoogleService-Info.plist
+
+      # Firebase SDK'sı Swift Package Manager ile geliyorsa
+      # bu adım paketleri (Firebase dahil) önceden indirir,
+      # test adımı sırasında zaman kaybını ve olası network
+      # timeout hatalarını önler.
+      - name: Resolve Swift Package dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project SkyBarber_iOS.xcodeproj
+
+      - name: Run Unit & UI Tests
         run: |
           xcodebuild test \
             -project SkyBarber_iOS.xcodeproj \
             -scheme SkyBarber_iOS \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -only-testing:SkyBarber_iOSTests \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults.xcresult
