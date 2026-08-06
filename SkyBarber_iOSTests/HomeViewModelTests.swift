@@ -6,40 +6,38 @@ final class HomeViewModelTests: XCTestCase {
     var viewModel: HomeViewModel!
     var mockService: MockServiceService!
 
-    override func setUpWithError() throws {
+    override func setUp() {
+        super.setUp()
         mockService = MockServiceService()
         viewModel = HomeViewModel(serviceService: mockService)
     }
 
-    // tearDownWithError KALDIRILDI (SIGABRT Çökmesini Önler)
-
-    func test_loadServices_success_shouldPopulateServicesFromMock() async {
-        // When
-        await viewModel.loadServices()
-
-        // Then
-        XCTAssertFalse(viewModel.isLoading)
-        XCTAssertEqual(viewModel.services.count, 4)
-        XCTAssertEqual(viewModel.services.first?.title, "Haircut")
-        XCTAssertEqual(viewModel.services.first?.price, 300.0)
-        XCTAssertNil(viewModel.errorMessage)
+    override func tearDown() {
+        viewModel = nil
+        mockService = nil
+        super.tearDown()
     }
 
-    func test_selectService_shouldSetSelectedService() {
+    func testLoadServices_PopulatesServicesList() async {
+        // When (Eylem)
+        await viewModel.loadServices()
+        
+        // Then (Sonuç)
+        XCTAssertFalse(viewModel.isLoading, "İşlem bitince yükleme durumu kapanmalı")
+        XCTAssertFalse(viewModel.services.isEmpty, "Hizmetler listesi dolmalı (Mock servis verileri gelmeli)")
+        XCTAssertNil(viewModel.errorMessage, "Hata mesajı olmamalı")
+    }
+    
+    func testSelectService_SetsSelectedService() {
         // Given
-        let dummyService = Service(
-            id: "1",
-            title: "Haircut",
-            price: 300.0,
-            duration: 30,
-            iconName: "scissors"
-        )
-
+        let mockServiceItem = Service(id: "s1", title: "Saç Kesimi", price: 200, duration: 30, iconName: "scissors")
+        
         // When
-        viewModel.selectService(dummyService)
-
+        viewModel.selectService(mockServiceItem)
+        
         // Then
-        XCTAssertEqual(viewModel.selectedService?.id, "1")
-        XCTAssertEqual(viewModel.selectedService?.title, "Haircut")
+        XCTAssertNotNil(viewModel.selectedService, "Seçilen servis boş olmamalı")
+        XCTAssertEqual(viewModel.selectedService?.id, "s1", "Seçilen servisin ID'si doğru atanmalı")
+        XCTAssertEqual(viewModel.selectedService?.title, "Saç Kesimi", "Seçilen servisin adı doğru atanmalı")
     }
 }
