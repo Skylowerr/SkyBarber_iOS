@@ -56,11 +56,17 @@ class AuthViewModel: ObservableObject {
     }
     
     func logout() async {
-        do {
-            try await authService.logout()
-            self.currentUser = nil
-        } catch {
-            self.errorMessage = error.localizedDescription
+            do {
+                try await authService.logout()
+                
+                // Arayüzü güncelleyen kısmı Ana Thread'e (MainActor) zorluyoruz
+                await MainActor.run {
+                    self.currentUser = nil
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                }
+            }
         }
-    }
 }
