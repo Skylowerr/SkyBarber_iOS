@@ -14,7 +14,16 @@ struct User: Identifiable, Codable {
     let phoneNumber: String
     let role: UserRole
     
-    // User roles to distinguish admin permissions (e.g., adding services)
+    // Veritabanındaki (Web) key'ler ile Swift modelini eşleştiriyoruz
+    enum CodingKeys: String, CodingKey {
+        case id
+        case fullName = "full_name" // Web tarafındaki isimlendirme
+        case email
+        case phoneNumber
+        case role
+    }
+    
+    // User roles to distinguish admin permissions
     enum UserRole: String, Codable {
         case customer
         case admin

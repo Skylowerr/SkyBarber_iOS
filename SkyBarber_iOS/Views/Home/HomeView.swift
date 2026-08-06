@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     // 1. ViewModel'ları içeri alıyoruz
     @StateObject private var viewModel = HomeViewModel()
+    @ObservedObject var authViewModel: AuthViewModel
     
     // 2. Sayfa geçişlerini kontrol eden tetikleyicilerimiz (Burası yeni eklendi)
     @State private var navigateToBooking = false
@@ -140,9 +141,22 @@ struct HomeView: View {
                 ProfileView(currentUser: currentUser)
             }
         }
+        .toolbar {
+                        // MÜŞTERİ ÇIKIŞ BUTONU
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: {
+                                Task {
+                                    await authViewModel.logout()
+                                }
+                            }) {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    .foregroundColor(.red)
+                            }
+                        }
+                    }
     }
 }
 
 #Preview {
-    HomeView(currentUser: User(id: "1", fullName: "Emirhan Sky", email: "test@gmail.com", phoneNumber: "123", role: .customer))
+    HomeView(authViewModel: AuthViewModel(authService: MockAuthService()), currentUser: User(id: "1", fullName: "Emirhan Sky", email: "test@gmail.com", phoneNumber: "123", role: .customer))
 }

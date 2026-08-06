@@ -53,14 +53,13 @@ class FirebaseAuthService: AuthServiceProtocol {
             role: .customer
         )
         
-        // 2. Web şemanla tam uyumlu olacak şekilde verileri Firestore'a yazıyoruz
         let userData: [String: Any] = [
             "id": user.id,
+            "full_name": user.fullName,                  // Swift tarafındaki fullName'i, full_name key'i ile yolluyoruz
             "email": user.email,
-            "fullName": user.fullName,
-            "phoneNumber": user.phoneNumber,
+            "phoneNumber": user.phoneNumber,             // Web tarafında da phoneNumber olarak kalmış
             "role": user.role.rawValue,
-            "created_at": ISO8601DateFormatter().string(from: Date()) // Web tarafındaki formatla uyumlu timestamp
+            "created_at": Date().timeIntervalSince1970   // Web tarafındaki görseldeki gibi TimeInterval formatında tarih
         ]
         
         try await db.collection("users").document(uid).setData(userData)
