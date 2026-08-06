@@ -1,33 +1,27 @@
-name: iOS CI/CD Pipeline
+name: iOS CI
 
 on:
   push:
-    branches: [ "default", "main" ]
+    branches: [ "main", "testing_branch", "default" ]
   pull_request:
-    branches: [ "default", "main" ]
+    branches: [ "main", "default" ]
 
 jobs:
-  test:
-    name: Build & Run Unit Tests
+  build_and_test:
     runs-on: macos-15
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Xcode Version
-        run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer || true
+      - name: Set Default Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.app/Contents/Developer
 
-      - name: Show Xcode Version
-        run: xcrun xcodebuild -version
-
-      - name: Run Unit Tests
+      - name: Run Unit & UI Tests
         run: |
-          xcodebuild test \
+          xcodebuild clean test \
             -project SkyBarber_iOS.xcodeproj \
             -scheme SkyBarber_iOS \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -only-testing:SkyBarber_iOSTests \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_REQUIRED=NO
