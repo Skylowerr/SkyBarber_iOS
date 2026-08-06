@@ -1,0 +1,30 @@
+# Xcode User Data & Cache
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+*.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+.DS_Store
+
+# Swift Package Manager & CocoaPods
+.build/
+Packages/
+Package.pins
+Pods/
+Podfile.lock
+*.xcworkspace
+
+# --- SECURITY / CREDENTIALS (CRITICAL) ---
+# Firebase ve hassas Google yapılandırma dosyalarını asla commit'leme!
+GoogleService-Info.plist
+*GoogleService-Info.plist
+*.plist.secret
+*.pem
+*.p12
+*.p8
+*.key
+*.config
+*.env
+*.env.*

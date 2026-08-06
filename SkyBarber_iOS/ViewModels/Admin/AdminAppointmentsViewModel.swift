@@ -1,17 +1,9 @@
-//
-//  HomeViewModel.swift
-//  SkyBarber_iOS
-//
-//  Created by Emirhan Gökçe on 14.07.2026.
-//
-
 import Foundation
 import Combine
 
 @MainActor
-class HomeViewModel: ObservableObject {
-    @Published var services: [Service] = []
-    @Published var selectedService: Service?
+class AdminAppointmentsViewModel: ObservableObject {
+    @Published var appointments: [Appointment] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -21,20 +13,15 @@ class HomeViewModel: ObservableObject {
         self.serviceService = serviceService
     }
     
-    func loadServices() async {
+    func loadAllAppointments() async {
         isLoading = true
         errorMessage = nil
-        
         do {
-            self.services = try await serviceService.fetchServices()
+            self.appointments = try await serviceService.fetchAllAppointments()
             self.isLoading = false
         } catch {
             self.errorMessage = error.localizedDescription
             self.isLoading = false
         }
-    }
-    
-    func selectService(_ service: Service) {
-        selectedService = service
     }
 }

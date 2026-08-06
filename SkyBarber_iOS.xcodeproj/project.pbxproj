@@ -6,8 +6,36 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6B38C5A830063EBC0041FD83 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5A730063EBC0041FD83 /* FirebaseAuth */; };
+		6B38C5AA30063EBC0041FD83 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5A930063EBC0041FD83 /* FirebaseCore */; };
+		6B38C5AC30063EBC0041FD83 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5AB30063EBC0041FD83 /* FirebaseFirestore */; };
+		6B38C5AE30063EBC0041FD83 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5AD30063EBC0041FD83 /* FirebaseFirestoreCombine-Community */; };
+		6B38C5B030063EBC0041FD83 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6B38C5AF30063EBC0041FD83 /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6BC2132D3016227F00335D43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6B7EFE623005885F00487318 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6B7EFE693005885F00487318;
+			remoteInfo = SkyBarber_iOS;
+		};
+		6BC2133C3016229400335D43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6B7EFE623005885F00487318 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6B7EFE693005885F00487318;
+			remoteInfo = SkyBarber_iOS;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		6B38C5B73006426F0041FD83 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		6B7EFE6A3005885F00487318 /* SkyBarber_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkyBarber_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BC213293016227F00335D43 /* SkyBarber_iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyBarber_iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BC213363016229400335D43 /* SkyBarber_iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyBarber_iOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +44,39 @@
 			path = SkyBarber_iOS;
 			sourceTree = "<group>";
 		};
+		6BC2132A3016227F00335D43 /* SkyBarber_iOSTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SkyBarber_iOSTests;
+			sourceTree = "<group>";
+		};
+		6BC213373016229400335D43 /* SkyBarber_iOSUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SkyBarber_iOSUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6B7EFE673005885F00487318 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B38C5AA30063EBC0041FD83 /* FirebaseCore in Frameworks */,
+				6B38C5AE30063EBC0041FD83 /* FirebaseFirestoreCombine-Community in Frameworks */,
+				6B38C5A830063EBC0041FD83 /* FirebaseAuth in Frameworks */,
+				6B38C5B030063EBC0041FD83 /* FirebaseStorage in Frameworks */,
+				6B38C5AC30063EBC0041FD83 /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BC213263016227F00335D43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BC213333016229400335D43 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,7 +90,10 @@
 			isa = PBXGroup;
 			children = (
 				6B7EFE6C3005885F00487318 /* SkyBarber_iOS */,
+				6BC2132A3016227F00335D43 /* SkyBarber_iOSTests */,
+				6BC213373016229400335D43 /* SkyBarber_iOSUITests */,
 				6B7EFE6B3005885F00487318 /* Products */,
+				6B38C5B73006426F0041FD83 /* .gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,6 +101,8 @@
 			isa = PBXGroup;
 			children = (
 				6B7EFE6A3005885F00487318 /* SkyBarber_iOS.app */,
+				6BC213293016227F00335D43 /* SkyBarber_iOSTests.xctest */,
+				6BC213363016229400335D43 /* SkyBarber_iOSUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -65,10 +127,61 @@
 			);
 			name = SkyBarber_iOS;
 			packageProductDependencies = (
+				6B38C5A730063EBC0041FD83 /* FirebaseAuth */,
+				6B38C5A930063EBC0041FD83 /* FirebaseCore */,
+				6B38C5AB30063EBC0041FD83 /* FirebaseFirestore */,
+				6B38C5AD30063EBC0041FD83 /* FirebaseFirestoreCombine-Community */,
+				6B38C5AF30063EBC0041FD83 /* FirebaseStorage */,
 			);
 			productName = SkyBarber_iOS;
 			productReference = 6B7EFE6A3005885F00487318 /* SkyBarber_iOS.app */;
 			productType = "com.apple.product-type.application";
+		};
+		6BC213283016227F00335D43 /* SkyBarber_iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6BC2132F3016227F00335D43 /* Build configuration list for PBXNativeTarget "SkyBarber_iOSTests" */;
+			buildPhases = (
+				6BC213253016227F00335D43 /* Sources */,
+				6BC213263016227F00335D43 /* Frameworks */,
+				6BC213273016227F00335D43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6BC2132E3016227F00335D43 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6BC2132A3016227F00335D43 /* SkyBarber_iOSTests */,
+			);
+			name = SkyBarber_iOSTests;
+			packageProductDependencies = (
+			);
+			productName = SkyBarber_iOSTests;
+			productReference = 6BC213293016227F00335D43 /* SkyBarber_iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6BC213353016229400335D43 /* SkyBarber_iOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6BC2133E3016229400335D43 /* Build configuration list for PBXNativeTarget "SkyBarber_iOSUITests" */;
+			buildPhases = (
+				6BC213323016229400335D43 /* Sources */,
+				6BC213333016229400335D43 /* Frameworks */,
+				6BC213343016229400335D43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6BC2133D3016229400335D43 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6BC213373016229400335D43 /* SkyBarber_iOSUITests */,
+			);
+			name = SkyBarber_iOSUITests;
+			packageProductDependencies = (
+			);
+			productName = SkyBarber_iOSUITests;
+			productReference = 6BC213363016229400335D43 /* SkyBarber_iOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -83,6 +196,14 @@
 					6B7EFE693005885F00487318 = {
 						CreatedOnToolsVersion = 26.2;
 					};
+					6BC213283016227F00335D43 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 6B7EFE693005885F00487318;
+					};
+					6BC213353016229400335D43 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 6B7EFE693005885F00487318;
+					};
 				};
 			};
 			buildConfigurationList = 6B7EFE653005885F00487318 /* Build configuration list for PBXProject "SkyBarber_iOS" */;
@@ -94,18 +215,37 @@
 			);
 			mainGroup = 6B7EFE613005885F00487318;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6B38C5A630063EBC0041FD83 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6B7EFE6B3005885F00487318 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				6B7EFE693005885F00487318 /* SkyBarber_iOS */,
+				6BC213283016227F00335D43 /* SkyBarber_iOSTests */,
+				6BC213353016229400335D43 /* SkyBarber_iOSUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		6B7EFE683005885F00487318 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BC213273016227F00335D43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BC213343016229400335D43 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +262,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6BC213253016227F00335D43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BC213323016229400335D43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6BC2132E3016227F00335D43 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6B7EFE693005885F00487318 /* SkyBarber_iOS */;
+			targetProxy = 6BC2132D3016227F00335D43 /* PBXContainerItemProxy */;
+		};
+		6BC2133D3016229400335D43 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6B7EFE693005885F00487318 /* SkyBarber_iOS */;
+			targetProxy = 6BC2133C3016229400335D43 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		6B7EFE733005886000487318 /* Debug */ = {
@@ -329,6 +496,98 @@
 			};
 			name = Release;
 		};
+		6BC213303016227F00335D43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GXK7JN5AN2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Skylowerr.SkyBarber-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SkyBarber_iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SkyBarber_iOS";
+			};
+			name = Debug;
+		};
+		6BC213313016227F00335D43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GXK7JN5AN2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Skylowerr.SkyBarber-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SkyBarber_iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SkyBarber_iOS";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6BC2133F3016229400335D43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GXK7JN5AN2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Skylowerr.SkyBarber-iOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SkyBarber_iOS;
+			};
+			name = Debug;
+		};
+		6BC213403016229400335D43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GXK7JN5AN2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Skylowerr.SkyBarber-iOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SkyBarber_iOS;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -350,7 +609,64 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		6BC2132F3016227F00335D43 /* Build configuration list for PBXNativeTarget "SkyBarber_iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6BC213303016227F00335D43 /* Debug */,
+				6BC213313016227F00335D43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6BC2133E3016229400335D43 /* Build configuration list for PBXNativeTarget "SkyBarber_iOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6BC2133F3016229400335D43 /* Debug */,
+				6BC213403016229400335D43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6B38C5A630063EBC0041FD83 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.16.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6B38C5A730063EBC0041FD83 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B38C5A630063EBC0041FD83 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		6B38C5A930063EBC0041FD83 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B38C5A630063EBC0041FD83 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		6B38C5AB30063EBC0041FD83 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B38C5A630063EBC0041FD83 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6B38C5AD30063EBC0041FD83 /* FirebaseFirestoreCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B38C5A630063EBC0041FD83 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseFirestoreCombine-Community";
+		};
+		6B38C5AF30063EBC0041FD83 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B38C5A630063EBC0041FD83 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6B7EFE623005885F00487318 /* Project object */;
 }

@@ -6,3 +6,70 @@
 //
 
 import Foundation
+import FirebaseAuth
+import FirebaseFirestore
+
+class FirebaseAuthService: AuthServiceProtocol {
+    private let auth = Auth.auth()
+    private let db = Firestore.firestore()
+    
+    var currentUser: User?
+    
+    func login(email: String, password: String) async throws -> User {
+        // 1. Firebase Auth ile giriş yap
+        let result = try await auth.signIn(withEmail: email, password: password)
+        let uid = result.user.uid
+        
+        // 2. Firestore'daki 'users' koleksiyonundan detayları çek
+        let document = try await db.collection("users").document(uid).getDocument()
+        
+        guard let data = document.data() else {
+            throw NSError(domain: "AuthError", code: 404, userInfo: [NSLocalizedDescriptionKey: "User profile not found in database."])
+        }
+        
+        // Ekran resmindeki şemaya göre eşleştiriyoruz (fullName ve phoneNumber yoksa güvenli fallback koyuyoruz)
+        let user = User(
+            id: uid,
+            fullName: data["fullName"] as? String ?? (data["email"] as? String ?? "User"),
+            email: data["email"] as? String ?? email,
+            phoneNumber: data["phoneNumber"] as? String ?? "",
+            role: User.UserRole(rawValue: data["role"] as? String ?? "customer") ?? .customer
+        )
+        
+        self.currentUser = user
+        return user
+    }
+    
+    func register(email: String, password: String, fullName: String, phoneNumber: String) async throws -> User {
+        // 1. Firebase Auth üzerinde yeni kullanıcı oluştur
+        let result = try await auth.createUser(withEmail: email, password: password)
+        let uid = result.user.uid
+        
+        let user = User(
+            id: uid,
+            fullName: fullName,
+            email: email,
+            phoneNumber: phoneNumber,
+            role: .customer
+        )
+        
+        let userData: [String: Any] = [
+            "id": user.id,
+            "full_name": user.fullName,                  // Swift tarafındaki fullName'i, full_name key'i ile yolluyoruz
+            "email": user.email,
+            "phoneNumber": user.phoneNumber,             // Web tarafında da phoneNumber olarak kalmış
+            "role": user.role.rawValue,
+            "created_at": Date().timeIntervalSince1970   // Web tarafındaki görseldeki gibi TimeInterval formatında tarih
+        ]
+        
+        try await db.collection("users").document(uid).setData(userData)
+        
+        self.currentUser = user
+        return user
+    }
+    
+    func logout() async throws {
+        try auth.signOut()
+        self.currentUser = nil
+    }
+}
