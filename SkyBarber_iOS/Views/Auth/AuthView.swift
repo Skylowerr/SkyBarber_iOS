@@ -67,7 +67,8 @@ struct AuthView: View {
                             await viewModel.register(email: email, password: password, fullName: fullName, phoneNumber: phoneNumber)
                         }
                     }
-                }) {
+                })
+                {
                     ZStack {
                         if viewModel.isLoading {
                             ProgressView()
@@ -87,6 +88,7 @@ struct AuthView: View {
                 .disabled(viewModel.isLoading)
                 .padding(.horizontal, 24)
                 .padding(.top, 10)
+                .accessibilityIdentifier("loginButton")
                 
                 // Toggle Button
                 Button(action: {
