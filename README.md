@@ -7,7 +7,7 @@ SkyBarber iOS is the native mobile counterpart of the SkyBarber platform, built 
 ## 🚀 Distribution
 
 - **Platform:** iOS (native app, no browser-based deployment)
-- **Shared Backend:** Connects to the same Firebase Cloud Firestore project used by the [SkyBarber web app](https://skybarber.vercel.app), keeping data (appointments, services, users) in sync across both platforms.
+- **Shared Backend:** Connects to the same Firebase Cloud Firestore project used by the [SkyBarber web app](https://skybarber-web.vercel.app), keeping data (appointments, services, users) in sync across both platforms.
 
 ---
 
