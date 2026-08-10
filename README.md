@@ -16,7 +16,8 @@ SkyBarber iOS is the native mobile counterpart of the SkyBarber platform, built 
 ### App
 - **Language:** Swift
 - **UI Framework:** SwiftUI
-- **Architecture Pattern:** MVVM (Model-View-ViewModel)
+- **Architecture Pattern:** MVVM (Model-View-ViewModel).
+- **The SOLID Principle**: Flexible, modular, and extensible software design
 - **Modules:** `App`, `Core`, `Models`, `Services`, `ViewModels`, `Views`
 
 ### Backend Integration
