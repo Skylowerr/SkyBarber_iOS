@@ -16,7 +16,7 @@ The following versions of the project are currently receiving security updates:
 If you discover a security vulnerability in this project, **PLEASE DO NOT create a public GitHub Issue.** Doing so may allow others to exploit the vulnerability before a patch is released.
 
 Instead, please report security vulnerabilities directly via email to:
-**[YourEmailAddress@gmail.com]**
+**gokceemirhan23@gmail.com**
 
 In your email, please include:
 * The type of vulnerability (e.g., XSS, SQL Injection, JWT flaw, etc.)
